@@ -1,8 +1,13 @@
+/**
+ * Prepare dependencies
+ */
 const Discord = require("discord.js");
 const axios = require("axios");
 const randomstring = require("randomstring");
 const { config } = require("dotenv");
+const client = new Discord.Client();
 
+// allow access to .env file
 config({ path: __dirname + "/.env" });
 
 const formatBytes = (bytes, decimals) => {
@@ -22,11 +27,12 @@ const formatBytes = (bytes, decimals) => {
   };
 };
 
-const client = new Discord.Client();
-
+// command prefix
 const prefix = "!";
+// available commands
 const commands = ["help", "gen", "usage"];
 
+// prepare embed message
 const commandList = new Discord.MessageEmbed()
   .setColor("#f7b586")
   .setTitle("Simp Bot Help Commands:")
@@ -50,49 +56,71 @@ const commandList = new Discord.MessageEmbed()
     }
   );
 
+/**
+ * Trigger once ready.
+ */
 client.once("ready", () => {
   console.log("Simp Bot is now online!");
 });
 
+/**
+ * Watch message event.
+ */
 client.on("message", async (message) => {
   try {
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
+    /**
+     * allow messages from DMs only.
+     * allow messages with prefix only.
+     * don't allow messages from bots.
+     */
+    if (!message.content.startsWith(prefix) || message.author.bot || message.channel.type !== 'dm') return;
 
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
+    // send command list if command doesn't exists
     if (!commands.includes(command)) {
       message.author.send(commandList);
       return;
     }
 
     switch (command) {
+      // trigger !help command
       case "help":
         message.author.send(commandList);
         break;
+
+      // trigger !gen command
       case "gen": {
         let [proxyUsername, proxyPassword, planId, quantity, country] = args;
-        if (!proxyUsername)
-          return message.author.send("Missing proxy username");
-        if (!proxyPassword)
-          return message.author.send("Missing proxy password");
+
+        if (!proxyUsername) return message.author.send("Missing proxy username");
+
+        if (!proxyPassword) return message.author.send("Missing proxy password");
+
         if (!planId) return message.author.send("Missing plan ID");
+
         if (!quantity) return message.author.send("Missing quantity");
-        if (quantity < 1) return message.author.send("Quantity must be > 0");
+
+        if (parseInt(quantity) && quantity < 1) return message.author.send("Quantity must be > 0");
+
         if (!country) return message.author.send("Missing country");
 
         country = country.toLowerCase();
-        const proxyList = [...Array(quantity)]
-          .map(
-            () =>
-              `residential.hypebit.io:19198:username-${proxyUsername}-plan-${planId}-country-${country}-session-${randomstring.generate(
-                6
-              )}:${proxyPassword}`
-          )
-          .join("\n");
 
-        return message.author.send(proxyList);
+        const list = []
+
+        for (let index = 0; index < quantity; index++) {
+          const rnd = randomstring.generate(6)
+          list.push(`residential.hypebit.io:19198:username-${proxyUsername}-plan-${planId}-country-${country}-session-${rnd}:${proxyPassword}`)
+        }
+
+        message.author.send(list);
+
+        break
       }
+
+      // trigger !usage command
       case "usage": {
         let [subuserId, planId] = args;
         if (!subuserId) return message.author.send("Missing user ID");
@@ -106,12 +134,14 @@ client.on("message", async (message) => {
           },
         });
 
-        return message.author.send(
+        message.author.send(
           `You have used ${formatBytes(
             response.data.data.usage,
             2
           )} out of ${formatBytes(response.data.data.data, 2)}.`
         );
+
+        break
       }
     }
   } catch (error) {
