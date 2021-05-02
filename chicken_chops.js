@@ -167,24 +167,24 @@ client.on("message", async (message) => {
         .then(({data}) => data)
         .catch(({response}) => response);
 
-        if(responseisp && !responseisp.statusCode && responseisp.success) 
-                
-          message.author.send(
-          `IP List for ${subuserId} in Plan ${planId}`)
-        
-        {
+        if(responseisp && !responseisp.statusCode && responseisp.success) {
+          message.author.send(`IP List for ${subuserId} in Plan ${planId}`)
+
           // chunk the response to 20 items
           const chunked = _.chunk(responseisp.data.ips, 20);
           // send them by chunk
           for (let index = 0; index < chunked.length; index++) {
-          message.author.send(chunked[index]);
+            message.author.send(chunked[index]);
           }
           
-        } if (responseisp && !responseisp.statusCode && !responseisp.data.success) {
-          message.author.send(responseisp.data.message)
           // bottom instructions
           message.author.send(' ```js\nTo use your IPs, Add :19198:{username}:{password}\nExample: 192.1.1.1:19198:user:pass``` ')
+
+        } else if (responseisp && !responseisp.statusCode && !responseisp.data.success) {
+          // Subuser does not have ISP plan
+          message.author.send(responseisp.data.message)
         } else {
+          // log error response
           console.log(responseisp);
         }
 
