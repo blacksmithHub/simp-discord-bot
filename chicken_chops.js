@@ -167,7 +167,7 @@ client.on("message", async (message) => {
         .then(({data}) => data)
         .catch(({response}) => response);
 
-        if(responseisp && !responseisp.statusCode && responseisp.data.success) {
+        if(responseisp && !responseisp.statusCode && responseisp.success) {
           // chunk the response to 10 items
           const chunked = _.chunk(responseisp.data.ips, 10);
 
@@ -177,8 +177,8 @@ client.on("message", async (message) => {
           }
 
           message.author.send('To use your IPs, Add :19198:{username}:{password}\nExample: 192.1.1.1:19198:user:pass')
-        } else if (responseisp && !responseisp.statusCode && !responseisp.data.success) {
-          message.author.send(responseisp.data.message)
+        } else if (responseisp && !responseisp.statusCode && !responseisp.success) {
+          message.author.send(responseisp.message)
         } else {
           console.log(responseisp);
         }
