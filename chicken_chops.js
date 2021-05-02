@@ -30,7 +30,7 @@ const formatBytes = (bytes, decimals) => {
 // command prefix
 const prefix = "!";
 // available commands
-const commands = ["help", "gen", "usage"];
+const commands = ["help", "genresis", "usage", "genisps"];
 
 // prepare embed message
 const commandList = new Discord.MessageEmbed()
@@ -43,9 +43,15 @@ const commandList = new Discord.MessageEmbed()
       inline: true,
     },
     {
-      name: "Generate",
+      name: "Generate Residentials",
       value:
-        "`!gen {proxyUsername} {proxyPassword} {planId} {quantity} {country}` \nTo generate your Residential SIMProxies",
+        "`!genresis {proxyUsername} {proxyPassword} {planId} {quantity} {country}` \nTo generate your Residential SIMProxies",
+      inline: true,
+    },
+    {
+      name: "Generate ISPs",
+      value:
+        "`!genisps {usesrID} {planId}` \nTo generate your ISP SIMProxies",
       inline: true,
     },
     {
@@ -90,8 +96,8 @@ client.on("message", async (message) => {
         message.author.send(commandList);
         break;
 
-      // trigger !gen command
-      case "gen": {
+      // trigger !genresis command
+      case "genresis": {
         let [proxyUsername, proxyPassword, planId, quantity, country] = args;
 
         if (!proxyUsername) return message.author.send("Missing proxy username");
@@ -114,7 +120,7 @@ client.on("message", async (message) => {
           const rnd = randomstring.generate(6)
           list.push(`residential.hypebit.io:19198:username-${proxyUsername}-plan-${planId}-country-${country}-session-${rnd}:${proxyPassword}`)
         }
-
+        
         message.author.send(list);
 
         break
@@ -143,6 +149,32 @@ client.on("message", async (message) => {
 
         break
       }
+
+       // trigger !genisps command
+      case "genisps": {
+        let [subuserId, planId] = args;
+        if (!subuserId) return message.author.send("Missing user ID");
+        if (!planId) return message.author.send("Missing plan ID");
+
+        const responseisp = await axios({
+          url: `${process.env.API}/v1/subusers/${subuserId}/isp/${planId}`,
+          method: "get",
+          headers: {
+            Authorization: "Bearer 7BuSdF2pEX",
+          },
+        });
+
+        var str = ("\n");
+
+        for (let i = 10; i < str.match; i += 10) {
+          const toSend = str.substring(i, Math.min(str.match, i + 10));
+          sendMessage(toSend);
+
+        message.author.send(responseisp);
+        }
+
+        break
+          }
     }
   } catch (error) {
     console.error(error);
