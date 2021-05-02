@@ -167,7 +167,7 @@ client.on("message", async (message) => {
         .then(({data}) => data)
         .catch(({response}) => response);
 
-        if(responseisp && !responseisp.statusCode) {
+        if(responseisp && !responseisp.statusCode && responseisp.data.success) {
           // chunk the response to 10 items
           const chunked = _.chunk(responseisp.data.ips, 10);
 
@@ -175,16 +175,13 @@ client.on("message", async (message) => {
           for (let index = 0; index < chunked.length; index++) {
             message.author.send(chunked[index]);
           }
+
+          message.author.send('To use your IPs, Add :19198:{username}:{password}\nExample: 192.1.1.1:19198:user:pass')
+        } else if (responseisp && !responseisp.statusCode && !responseisp.data.success) {
+          message.author.send(responseisp.data.message)
+        } else {
+          console.log(responseisp);
         }
-
-        // var str = ("\n");
-
-        // for (let i = 10; i < str.match; i += 10) {
-        //   const toSend = str.substring(i, Math.min(str.match, i + 10));
-        //   sendMessage(toSend);
-
-        // message.author.send(responseisp);
-        // }
 
         break
       }
