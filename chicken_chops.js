@@ -56,7 +56,7 @@ const commandList = new Discord.MessageEmbed()
     {
       name: "Generate ISPs",
       value:
-        "`!genisps {usesrID} {planId}` \nTo generate your ISP SIMProxies",
+        "`!genisps {userID} {planId}` \nTo generate your ISP SIMProxies",
       inline: true,
     },
     {
@@ -65,6 +65,12 @@ const commandList = new Discord.MessageEmbed()
         "`!usage {userId} {planId}` \nTo show your current usage in your Residential Plan",
       inline: true,
     }
+ //   {
+ //     name: "ISP Plans",
+  //    value:
+  //      "`!ispplans {userId}` \nTo show your current ISP Plans",
+  //    inline: true,
+  //  }
   );
 
 /**
@@ -190,7 +196,49 @@ client.on("message", async (message) => {
 
         break
       }
-    }
+
+  //    case "ispplans": {
+  //        let [subuserId] = args;
+  //        if (!subuserId) return message.author.send("Missing user ID");
+ // 
+  //        const responseisp = await axios({
+  //          url: `${process.env.API_URL}/v1/subusers/${subuserId}/isp`,
+  //          method: "get",
+  //          headers: headers,
+  //        })
+  //        .then(({data}) => data)
+  //        .catch(({response}) => response);
+//
+  //        const array = response.data.ips
+   //       console.log(array[0].period)
+  //
+  //        if(response.success=true)    
+   //       
+  //          message.author.send(
+   //           `UserID ${subuserId} has:
+  //            Plan ${response.data._ids} with ${response.data.ips} IPs expiring in ${response.data.end}`
+   //           )
+          
+          {
+            // chunk the response to 20 items
+//            const chunked = _.chunk(responseisp.data.ips, 20);
+            // send them by chunk
+//            for (let index = 0; index < chunked.length; index++) {
+//            message.author.send(chunked[index]);
+//            }
+            
+//          } if (responseisp && !responseisp.statusCode && !responseisp.data.success) {
+//            message.author.send(responseisp.data.message)
+            // bottom instructions
+//            message.author.send(' ```js\nTo use your IPs, Add :19198:{username}:{password}\nExample: 192.1.1.1:19198:user:pass``` ')
+//          } else {
+//            console.log(responseisp);
+ //         }
+  
+ //         break
+   //       }
+        }
+      }
   } catch (error) {
     console.error(error);
   }
