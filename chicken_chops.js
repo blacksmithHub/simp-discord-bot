@@ -177,8 +177,8 @@ client.on("message", async (message) => {
           }
 
           message.author.send('To use your IPs, Add :19198:{username}:{password}\nExample: 192.1.1.1:19198:user:pass')
-        } else if (responseisp && !responseisp.statusCode && !responseisp.success) {
-          message.author.send(responseisp.message)
+        } else if (responseisp && !responseisp.statusCode && !responseisp.data.success) {
+          message.author.send(responseisp.data.message)
         } else {
           console.log(responseisp);
         }
