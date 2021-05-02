@@ -6,9 +6,14 @@ const axios = require("axios");
 const randomstring = require("randomstring");
 const { config } = require("dotenv");
 const client = new Discord.Client();
+const _ = require('lodash')
 
 // allow access to .env file
 config({ path: __dirname + "/.env" });
+
+const headers = {
+  Authorization: `Bearer ${process.env.API_TOKEN}`
+}
 
 const formatBytes = (bytes, decimals) => {
   if (typeof bytes === "string") bytes = parseInt(bytes);
@@ -133,11 +138,9 @@ client.on("message", async (message) => {
         if (!planId) return message.author.send("Missing plan ID");
 
         const response = await axios({
-          url: `${process.env.API}/v1/subusers/${subuserId}/residential/${planId}`,
+          url: `${process.env.API_URL}/v1/subusers/${subuserId}/residential/${planId}`,
           method: "get",
-          headers: {
-            Authorization: "Bearer 7BuSdF2pEX",
-          },
+          headers: headers,
         });
 
         message.author.send(
@@ -157,27 +160,38 @@ client.on("message", async (message) => {
         if (!planId) return message.author.send("Missing plan ID");
 
         const responseisp = await axios({
-          url: `${process.env.API}/v1/subusers/${subuserId}/isp/${planId}`,
+          url: `${process.env.API_URL}/v1/subusers/${subuserId}/isp/${planId}`,
           method: "get",
-          headers: {
-            Authorization: "Bearer 7BuSdF2pEX",
-          },
-        });
+          headers: headers,
+        })
+        .then(({data}) => data)
+        .catch(({response}) => response);
 
-        var str = ("\n");
+        if(responseisp && !responseisp.statusCode) {
+          // chunk the response to 10 items
+          const chunked = _.chunk(responseisp.data.ips, 10);
 
-        for (let i = 10; i < str.match; i += 10) {
-          const toSend = str.substring(i, Math.min(str.match, i + 10));
-          sendMessage(toSend);
-
-        message.author.send(responseisp);
+          // send them by chunk
+          for (let index = 0; index < chunked.length; index++) {
+            message.author.send(chunked[index]);
+          }
         }
 
+        // var str = ("\n");
+
+        // for (let i = 10; i < str.match; i += 10) {
+        //   const toSend = str.substring(i, Math.min(str.match, i + 10));
+        //   sendMessage(toSend);
+
+        // message.author.send(responseisp);
+        // }
+
         break
-          }
+      }
     }
   } catch (error) {
     console.error(error);
   }
 });
+
 client.login(process.env.DISCORD_TOKEN);
